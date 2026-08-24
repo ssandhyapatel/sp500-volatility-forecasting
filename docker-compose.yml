@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    container_name: volatility-api
+    restart: unless-stopped
+
+  dashboard:
+    build: .
+    command: streamlit run streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    container_name: volatility-dashboard
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      - API_URL=http://api:8000
