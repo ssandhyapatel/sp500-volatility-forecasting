@@ -214,6 +214,6 @@ print(response.json())
 
 ---
 
-## License
 
-MIT License — free to use, modify, and distribute.
+
+Copyright (c) 2026 Sandhya Patel. All Rights Reserved.
