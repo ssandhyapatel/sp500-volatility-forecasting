@@ -20,7 +20,8 @@ class NaiveModel:
 
     def predict(self, X, features_df):
         """Predict using vol_lag_1m as naive forecast."""
-        vol_lag_idx = list(features_df.columns).index('vol_lag_1m')
+      
+        vol_lag_idx = list(features_df.columns).index('vol_lag_1m') - 1
         return X[:, vol_lag_idx]
 
 
@@ -93,6 +94,7 @@ class LSTMModel:
         self.scaler = StandardScaler()
         self.model = None
         self.seq_len = LSTM_SEQ_LEN
+        self.last_train_X = None 
 
     def _create_sequences(self, X, y, seq_len):
         """Create sequences for LSTM input."""
@@ -131,9 +133,16 @@ class LSTMModel:
             validation_split=validation_split,
             verbose=0
         )
+        
+        self.last_train_X = X[-self.seq_len:]
+        
         return self
 
     def predict(self, X):
-        X_scaled = self.scaler.transform(X)
+
+        X_padded = np.vstack((self.last_train_X, X))
+        
+        X_scaled = self.scaler.transform(X_padded)
+        
         X_seq, _ = self._create_sequences(X_scaled, np.zeros(len(X_scaled)), self.seq_len)
         return self.model.predict(X_seq, verbose=0).flatten()
